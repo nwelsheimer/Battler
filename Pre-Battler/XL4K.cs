@@ -5,6 +5,7 @@ using OfficeOpenXml;
 using System.Data;
 using System.Drawing;
 using OfficeOpenXml.Style;
+using System.Windows.Forms;
 using General;
 
 namespace Pre_Battler
@@ -20,6 +21,88 @@ namespace Pre_Battler
         /// Someone needs to come along and figure out a way to design a spreadsheet template and store in the database, then pull
         /// the template a run time, feed data in to it, and generate output.
 
+        public static string getFilePath(int method, string fileName = "")
+        {
+            /// Simple function for displaying open or save dialog.
+
+            if (method == 1)
+            {
+                //Method 1, display save fialog
+                SaveFileDialog fileDialog = new SaveFileDialog();
+                fileDialog.FileName = fileName == "" ? "untitled.xlsx" : fileName + ".xlsx"; //if no filename specified use default
+                fileDialog.Filter = "Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*";
+                fileDialog.RestoreDirectory = true;
+                if (fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    return fileDialog.FileName;
+            }
+            else
+            {
+                //Method 2, display the open file dialog
+                OpenFileDialog fileDialog = new OpenFileDialog();
+                fileDialog.Filter = "Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*";
+                fileDialog.RestoreDirectory = true;
+                if (fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    return fileDialog.FileName;
+            }
+            return "";
+        }
+
+        public static bool basicExcelExport(string query, string fileName)
+        {
+            /// Basic export that will take the results of a query and dump it back as an unformatted xlsx file
+            const int startRow = 1;
+            try
+            {
+                //load the specified query in to a table
+                DataTable basicExport = Global.GetData(query).Tables[0];
+
+                //Delete the old file if it exists
+                if (File.Exists(fileName)) File.Delete(fileName);
+                FileInfo newFile = new FileInfo(fileName);
+
+                //Some global stuff
+                int totalColumns = basicExport.Columns.Count;
+                Char lastColumn = Global.LetterToNum(totalColumns);
+
+                // Build the workbook
+                using (ExcelPackage xlPackage = new ExcelPackage(newFile))
+                {
+                    // get handle to the existing worksheet
+                    ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets.Add("Export");
+                    int row = startRow;
+
+                    //output column headings
+                    for (int i = 1; i <= totalColumns; i++)
+                    {
+                        worksheet.Cells[Global.LetterToNum(i) + row.ToString()].Value = basicExport.Columns[i - 1].ColumnName;
+                    }
+                    row++;
+
+                    // get the data and fill onwards
+                    foreach (DataRow dr in basicExport.Rows)
+                    {
+                        int col = 1;
+                        // our query has the columns in the right order, so simply
+                        // iterate through the columns
+                        for (int i = 0; i < totalColumns; i++)
+                        {
+                            // do not bother filling cell with blank data (also useful if we have a formula in a cell)
+                            worksheet.Cells[row, i + 1].Value = dr[i];
+                            col++;
+                        }
+                        row++;
+                    }
+                    // save the new spreadsheet
+                    xlPackage.Save();
+                }
+
+                    return true;
+            } catch (Exception x) //Somehting went wrong
+            {
+                MessageBox.Show("There was a problem processing the export: " + x);
+                return false;
+            }
+        }
 
         public static string GenerateExport(int sessionId, string fileName = "", string fullPath = "")
         {

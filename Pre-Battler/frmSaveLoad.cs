@@ -268,6 +268,8 @@ namespace Pre_Battler
             txtSessionName.Enabled = false;
             chkSelectAll.Enabled = false;
             btnNext.Enabled = false;
+            btnExport.Enabled = false;
+            btnImport.Enabled = false;
 
             loadSessions();
         }
@@ -293,6 +295,9 @@ namespace Pre_Battler
             cmbSite.Enabled = true;
             txtSessionName.Enabled = true;
             chkSelectAll.Enabled = true;
+            btnExport.Enabled = true;
+            btnImport.Enabled = true;
+
             if (txtSessionName.Text.Length >= 3)
                 btnNext.Enabled = true; 
         }
@@ -360,6 +365,20 @@ namespace Pre_Battler
         private void ugrdSession_DoubleClickRow(object sender, DoubleClickRowEventArgs e)
         {
             btnNext.PerformClick();
+        }
+
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            string skulevel = cmbSKULevel.SelectedValue.ToString();
+            string billto = cmbAccount.SelectedValue.ToString();
+            string filename = xl4k.getFilePath(1,"export");
+
+            xl4k.basicExcelExport("exec usp_PB_SelectStores @SKULevel='" + skulevel + "', @BillTo=" + billto, filename);
+        }
+
+        private void btnImport_Click(object sender, EventArgs e)
+        {
+            xl4k.getFilePath(2);
         }
     }
 }

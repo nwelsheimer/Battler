@@ -71,6 +71,8 @@
             this.ugrdSession = new Infragistics.Win.UltraWinGrid.UltraGrid();
             this.mnSessionRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.miInactive = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnExport = new System.Windows.Forms.Button();
+            this.btnImport = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grdStores)).BeginInit();
@@ -429,11 +431,33 @@
             this.miInactive.Text = "make inactive";
             this.miInactive.Click += new System.EventHandler(this.miInactive_Click);
             // 
+            // btnExport
+            // 
+            this.btnExport.Location = new System.Drawing.Point(126, 85);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(140, 19);
+            this.btnExport.TabIndex = 14;
+            this.btnExport.Text = "Export store list to excel";
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
+            // 
+            // btnImport
+            // 
+            this.btnImport.Location = new System.Drawing.Point(295, 85);
+            this.btnImport.Name = "btnImport";
+            this.btnImport.Size = new System.Drawing.Size(140, 19);
+            this.btnImport.TabIndex = 15;
+            this.btnImport.Text = "Import store list from excel";
+            this.btnImport.UseVisualStyleBackColor = true;
+            this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
+            // 
             // frmSaveLoad
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1100, 733);
+            this.Controls.Add(this.btnImport);
+            this.Controls.Add(this.btnExport);
             this.Controls.Add(this.pnlLoadSession);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtSessionName);
@@ -494,5 +518,7 @@
         private System.Windows.Forms.ToolStripMenuItem sELECTCOLUMNSToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip mnSessionRightClick;
         private System.Windows.Forms.ToolStripMenuItem miInactive;
+        private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.Button btnImport;
     }
 }

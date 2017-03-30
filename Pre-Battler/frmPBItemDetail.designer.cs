@@ -72,8 +72,9 @@
             this.sAVELAYOUTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bgExport = new System.ComponentModel.BackgroundWorker();
             this.pnlStatus = new System.Windows.Forms.Panel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.lblTotalStores = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.ugrdItemDetail)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ugrdRanks)).BeginInit();
             this.pnlRank.SuspendLayout();
@@ -281,6 +282,7 @@
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.lblTotalStores);
             this.groupBox1.Controls.Add(this.lblSite);
             this.groupBox1.Controls.Add(this.lblSKUShelf);
             this.groupBox1.Controls.Add(this.lblSKUUnits);
@@ -464,15 +466,6 @@
             this.pnlStatus.TabIndex = 16;
             this.pnlStatus.Visible = false;
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::Pre_Battler.Properties.Resources._58c7ec502dc4e637388739;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 36);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(112, 80);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            // 
             // lblStatus
             // 
             this.lblStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -482,6 +475,24 @@
             this.lblStatus.TabIndex = 1;
             this.lblStatus.Text = "Background export in progress";
             this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::Pre_Battler.Properties.Resources._58c7ec502dc4e637388739;
+            this.pictureBox1.Location = new System.Drawing.Point(3, 36);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(112, 80);
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
+            // 
+            // lblTotalStores
+            // 
+            this.lblTotalStores.AutoSize = true;
+            this.lblTotalStores.Location = new System.Drawing.Point(225, 100);
+            this.lblTotalStores.Name = "lblTotalStores";
+            this.lblTotalStores.Size = new System.Drawing.Size(98, 13);
+            this.lblTotalStores.TabIndex = 21;
+            this.lblTotalStores.Text = "Total Stores: 18";
             // 
             // frmPBItemDetail
             // 
@@ -558,5 +569,6 @@
         private System.Windows.Forms.Panel pnlStatus;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.Label lblTotalStores;
     }
 }

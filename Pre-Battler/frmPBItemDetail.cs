@@ -32,7 +32,8 @@ namespace Pre_Battler
             SessionName = SESSION;
 
             LoadGrid(SkuID, SiteID, ShipTos, SessionName);
-            
+
+            setStoreCount();
         }
         #region Major functions
         private void LoadGrid(string SiteID, string SkuID, string ShipTos, string SessionName)
@@ -126,7 +127,7 @@ namespace Pre_Battler
         {
             UltraGridRow updatedRow = ugrdItemDetail.Rows[RowNum];
             //DataRow updatedRow = gridTable.Rows[RowNum]; This won't work, we need the rows from the grid.
-            string SKU = updatedRow.Cells["SKU"].Value.ToString();//this is the row we changed
+            string prodId = updatedRow.Cells["prodId"].Value.ToString();//this is the row we changed
 
             //Round to nearest pack qty
             decimal rounded = Convert.ToInt32(updatedRow.Cells["qtyRequested"].Value);
@@ -144,7 +145,7 @@ namespace Pre_Battler
                 if (dr["Id"].ToString() == updatedRow.Cells["Id"].Value.ToString())
                     dr["qtyRequested"] = rounded;
 
-                if (dr["SKU"].ToString() == SKU)
+                if (dr["prodId"].ToString() == prodId)
                 {
                     NewDemand += Convert.ToInt32(dr["qtyRequested"]); //step through the rows, if the SKU matches, add the requested qty up for a new demand number
                 }
@@ -155,7 +156,7 @@ namespace Pre_Battler
 
             foreach (DataRow dr in gridTable.Rows)
             {
-                if (dr["SKU"].ToString() == SKU)
+                if (dr["prodId"].ToString() == prodId)
                 {
                     dr["available"] = newAvailable; //update the available amount for all rows with matching SKU
                 }
@@ -363,6 +364,17 @@ namespace Pre_Battler
             if (cmbSKUs.SelectedIndex > 0)
                 ugrdItemDetail.DisplayLayout.Bands[0].ColumnFilters["SKUDesc"].FilterConditions.Add(gridFilter);
 
+        }
+
+        private void setStoreCount()
+        {
+            //Function to count the number of stores in the grid
+            DataView tempView = new DataView(gridTable);
+            DataTable tempTable = tempView.ToTable(true, "shipId");
+
+            lblTotalStores.Text = "Total Stores: " + tempTable.Rows.Count.ToString();
+
+            tempTable.Clear();
         }
 
         private void lblExpand_Click(object sender, EventArgs e)
