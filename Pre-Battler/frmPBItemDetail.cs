@@ -34,6 +34,7 @@ namespace Pre_Battler
             LoadGrid(SkuID, SiteID, ShipTos, SessionName);
 
             setStoreCount();
+            updateSKUCounter();
         }
         #region Major functions
         private void LoadGrid(string SiteID, string SkuID, string ShipTos, string SessionName)
@@ -133,7 +134,7 @@ namespace Pre_Battler
             decimal rounded = Convert.ToInt32(updatedRow.Cells["qtyRequested"].Value);
             int packQty = Convert.ToInt32(updatedRow.Cells["PackQty"].Value);
             rounded = Math.Round(rounded / packQty) * packQty;
-            
+
 
             int NewDemand = 0;
             //Function does some basic math to recalculate the available quantities
@@ -181,7 +182,7 @@ namespace Pre_Battler
             }
         }
 
-        private void calculateTotalOH(int row=0)
+        private void calculateTotalOH(int row = 0)
         {
             foreach (DataRow dr in gridTable.Rows)
             {
@@ -218,7 +219,7 @@ namespace Pre_Battler
                             sold = Convert.ToInt32(dr["TW_Sold"].ToString());
                             break;
                         case "WOH 2 week average":
-                            sold = (Convert.ToInt32(dr["TW_Sold"].ToString())+Convert.ToInt32(dr["LW_Sold"].ToString()))/2;
+                            sold = (Convert.ToInt32(dr["TW_Sold"].ToString()) + Convert.ToInt32(dr["LW_Sold"].ToString())) / 2;
                             break;
                     }
 
@@ -322,6 +323,13 @@ namespace Pre_Battler
         }
         #endregion
         #region BS Fucntions
+        private void setupPGBar(int records)
+        {
+            pgBar.Value = 0;
+            pgBar.Maximum = records;
+            pgBar.Visible = true;
+        }
+
         private void btnBack_Click(object sender, EventArgs e)
         {
             if (cmbSKUs.SelectedIndex > 0)
@@ -339,6 +347,16 @@ namespace Pre_Battler
         private void ugrdRanks_KeyDown(object sender, KeyEventArgs e)
         {
             Global.GridNavigation(ugrdRanks, e);
+        }
+
+        private void updateSKUCounter()
+        {
+            //fantastic function that does the amazing task of counting where we are in the SKU list and updating a label!
+            //A FREAKING LABEL!!
+            string maxSku = (cmbSKUs.Items.Count - 1).ToString();
+            string curSku = cmbSKUs.SelectedIndex.ToString();
+
+            lblSKUCounter.Text = "SKU " + curSku + "/" + maxSku;
         }
 
         private void ugrdItemDetail_KeyDown(object sender, KeyEventArgs e)
@@ -363,7 +381,7 @@ namespace Pre_Battler
 
             if (cmbSKUs.SelectedIndex > 0)
                 ugrdItemDetail.DisplayLayout.Bands[0].ColumnFilters["SKUDesc"].FilterConditions.Add(gridFilter);
-
+            updateSKUCounter();
         }
 
         private void setStoreCount()
@@ -420,13 +438,17 @@ namespace Pre_Battler
 
             this.Cursor = Cursors.WaitCursor;
             DataRow rank;
+            setupPGBar(ugrdItemDetail.Rows.GetFilteredInNonGroupByRows().Count());
+
             foreach (UltraGridRow r in ugrdItemDetail.Rows.GetFilteredInNonGroupByRows())
             {
                 rank = rankDistinct.Select("Rank = '" + r.Cells["Rank"].Value + "'")[0];
                 r.Cells["qtyRequested"].Value = rank["Quantity"];
+                pgBar.PerformStep();
             }
             ugrdItemDetail.UpdateData();
-            updateSQL();
+            pgBar.Visible = false;
+            //updateSQL();
 
             this.Cursor = Cursors.Default;
         }
@@ -444,6 +466,7 @@ namespace Pre_Battler
             int demand;
             string WOHMethod = cmbWOH.Text;
 
+            setupPGBar(ugrdItemDetail.Rows.GetFilteredInNonGroupByRows().Count());
 
             this.Cursor = Cursors.WaitCursor;
             foreach (UltraGridRow r in ugrdItemDetail.Rows.GetFilteredInNonGroupByRows())
@@ -487,9 +510,12 @@ namespace Pre_Battler
                 demand = requestedWOH - woh > 0 ? (requestedWOH - woh) * sold : 0;
 
                 r.Cells["qtyRequested"].Value = demand;
+
+                pgBar.PerformStep();
             }
             ugrdItemDetail.UpdateData();
-            updateSQL();
+            pgBar.Visible = false;
+            //updateSQL();
 
             this.Cursor = Cursors.Default;
         }
@@ -501,6 +527,7 @@ namespace Pre_Battler
             int requestedQty = 0;
             int newQty = 0;
 
+            setupPGBar(ugrdItemDetail.Rows.GetFilteredInNonGroupByRows().Count());
 
             this.Cursor = Cursors.WaitCursor;
 
@@ -513,9 +540,12 @@ namespace Pre_Battler
                 newQty = requestedQty - onHand > 0 ? requestedQty - onHand : 0;
 
                 r.Cells["qtyRequested"].Value = newQty;
+
+                pgBar.PerformStep();
             }
             ugrdItemDetail.UpdateData();
-            updateSQL();
+            pgBar.Visible = false;
+            //updateSQL();
 
             this.Cursor = Cursors.Default;
         }
@@ -555,6 +585,12 @@ namespace Pre_Battler
         private void bgExport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             pnlStatus.Visible = false;
+        }
+
+        private void aDDSTORETOSESSIONToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmAddStore frm = new frmAddStore();
+            frm.ShowDialog();
         }
     }
 }

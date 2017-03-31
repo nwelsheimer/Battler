@@ -47,60 +47,94 @@ namespace Pre_Battler
             return "";
         }
 
-        public static bool basicExcelExport(string query, string fileName)
+        public static bool basicExcelExport(DataTable exportSource, string fileName)
         {
             /// Basic export that will take the results of a query and dump it back as an unformatted xlsx file
             const int startRow = 1;
-            try
+
+            if (fileName != "")
             {
-                //load the specified query in to a table
-                DataTable basicExport = Global.GetData(query).Tables[0];
-
-                //Delete the old file if it exists
-                if (File.Exists(fileName)) File.Delete(fileName);
-                FileInfo newFile = new FileInfo(fileName);
-
-                //Some global stuff
-                int totalColumns = basicExport.Columns.Count;
-                Char lastColumn = Global.LetterToNum(totalColumns);
-
-                // Build the workbook
-                using (ExcelPackage xlPackage = new ExcelPackage(newFile))
+                try
                 {
-                    // get handle to the existing worksheet
-                    ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets.Add("Export");
-                    int row = startRow;
+                    //more robust, now just relies on a datatable to be handed back and forth
+                    //DataTable basicExport = exportSource; 
 
-                    //output column headings
-                    for (int i = 1; i <= totalColumns; i++)
-                    {
-                        worksheet.Cells[Global.LetterToNum(i) + row.ToString()].Value = basicExport.Columns[i - 1].ColumnName;
-                    }
-                    row++;
+                    //Delete the old file if it exists
+                    if (File.Exists(fileName)) File.Delete(fileName);
+                    FileInfo newFile = new FileInfo(fileName);
 
-                    // get the data and fill onwards
-                    foreach (DataRow dr in basicExport.Rows)
+                    //Some global stuff
+                    int totalColumns = exportSource.Columns.Count;
+                    Char lastColumn = Global.LetterToNum(totalColumns);
+
+                    // Build the workbook
+                    using (ExcelPackage xlPackage = new ExcelPackage(newFile))
                     {
-                        int col = 1;
-                        // our query has the columns in the right order, so simply
-                        // iterate through the columns
-                        for (int i = 0; i < totalColumns; i++)
+                        // get handle to the existing worksheet
+                        ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets.Add("Export");
+                        int row = startRow;
+
+                        //output column headings
+                        for (int i = 1; i <= totalColumns; i++)
                         {
-                            // do not bother filling cell with blank data (also useful if we have a formula in a cell)
-                            worksheet.Cells[row, i + 1].Value = dr[i];
-                            col++;
+                            worksheet.Cells[Global.LetterToNum(i) + row.ToString()].Value = exportSource.Columns[i - 1].ColumnName;
                         }
                         row++;
+
+                        // get the data and fill onwards
+                        foreach (DataRow dr in exportSource.Rows)
+                        {
+                            int col = 1;
+                            // our query has the columns in the right order, so simply
+                            // iterate through the columns
+                            for (int i = 0; i < totalColumns; i++)
+                            {
+                                // do not bother filling cell with blank data (also useful if we have a formula in a cell)
+                                worksheet.Cells[row, i + 1].Value = dr[i];
+                                col++;
+                            }
+                            row++;
+                        }
+                        // save the new spreadsheet
+                        xlPackage.Save();
                     }
-                    // save the new spreadsheet
-                    xlPackage.Save();
-                }
 
                     return true;
-            } catch (Exception x) //Somehting went wrong
+                }
+                catch (Exception x) //Somehting went wrong
+                {
+                    MessageBox.Show("There was a problem processing the export: " + x);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        public static DataTable basicExcelImport(string path, string tabName, bool hasHeader = true)
+        {
+            using (var pck = new ExcelPackage())
             {
-                MessageBox.Show("There was a problem processing the export: " + x);
-                return false;
+                using (var stream = File.OpenRead(path))
+                {
+                    pck.Load(stream);
+                }
+                var ws = pck.Workbook.Worksheets[tabName];
+                DataTable tbl = new DataTable();
+                foreach (var firstRowCell in ws.Cells[1, 1, 1, ws.Dimension.End.Column])
+                {
+                    tbl.Columns.Add(hasHeader ? firstRowCell.Text : string.Format("Column {0}", firstRowCell.Start.Column));
+                }
+                var startRow = hasHeader ? 2 : 1;
+                for (int rowNum = startRow; rowNum <= ws.Dimension.End.Row; rowNum++)
+                {
+                    var wsRow = ws.Cells[rowNum, 1, rowNum, ws.Dimension.End.Column];
+                    DataRow row = tbl.Rows.Add();
+                    foreach (var cell in wsRow)
+                    {
+                        row[cell.Start.Column - 1] = cell.Text;
+                    }
+                }
+                return tbl;
             }
         }
 

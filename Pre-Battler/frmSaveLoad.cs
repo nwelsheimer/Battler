@@ -371,14 +371,22 @@ namespace Pre_Battler
         {
             string skulevel = cmbSKULevel.SelectedValue.ToString();
             string billto = cmbAccount.SelectedValue.ToString();
-            string filename = xl4k.getFilePath(1,"export");
-
-            xl4k.basicExcelExport("exec usp_PB_SelectStores @SKULevel='" + skulevel + "', @BillTo=" + billto, filename);
+            string filename = xl4k.getFilePath(1, "export");
+            xl4k.basicExcelExport(Global.GetData("exec usp_PB_SelectStores @SKULevel='" + skulevel + "', @BillTo=" + billto).Tables[0], filename);
+            //xl4k.basicExcelExport(grdShipToTable, filename);
         }
 
         private void btnImport_Click(object sender, EventArgs e)
         {
-            xl4k.getFilePath(2);
+            string filename = xl4k.getFilePath(2);
+            grdShipToTable = xl4k.basicExcelImport(filename, "Export");
+            grdShipToTable.Columns.Add("Selected", typeof(System.Boolean));
+            foreach (DataRow dr in grdShipToTable.Rows)
+                dr["Selected"] = true;
+
+            grdStores.DataSource = grdShipToTable.DefaultView;
+            btnNext.Enabled = false;
+            GridLayout();
         }
     }
 }

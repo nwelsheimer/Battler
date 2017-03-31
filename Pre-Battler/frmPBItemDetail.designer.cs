@@ -54,6 +54,7 @@
             this.btnMin = new System.Windows.Forms.Button();
             this.btnFull = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lblTotalStores = new System.Windows.Forms.Label();
             this.lblSite = new System.Windows.Forms.Label();
             this.lblSKUShelf = new System.Windows.Forms.Label();
             this.lblSKUUnits = new System.Windows.Forms.Label();
@@ -74,7 +75,9 @@
             this.pnlStatus = new System.Windows.Forms.Panel();
             this.lblStatus = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.lblTotalStores = new System.Windows.Forms.Label();
+            this.lblSKUCounter = new System.Windows.Forms.Label();
+            this.pgBar = new Infragistics.Win.UltraWinProgressBar.UltraProgressBar();
+            this.aDDSTORETOSESSIONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.ugrdItemDetail)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ugrdRanks)).BeginInit();
             this.pnlRank.SuspendLayout();
@@ -299,6 +302,15 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Summary Information";
             // 
+            // lblTotalStores
+            // 
+            this.lblTotalStores.AutoSize = true;
+            this.lblTotalStores.Location = new System.Drawing.Point(225, 100);
+            this.lblTotalStores.Name = "lblTotalStores";
+            this.lblTotalStores.Size = new System.Drawing.Size(98, 13);
+            this.lblTotalStores.TabIndex = 21;
+            this.lblTotalStores.Text = "Total Stores: 18";
+            // 
             // lblSite
             // 
             this.lblSite.AutoSize = true;
@@ -416,6 +428,7 @@
             this.tOOLSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.eXPORTTOEXCELToolStripMenuItem,
             this.rEFRESHAVAILABILITYToolStripMenuItem,
+            this.aDDSTORETOSESSIONToolStripMenuItem,
             this.sELECTCOLUMNSToolStripMenuItem,
             this.sAVELAYOUTToolStripMenuItem});
             this.tOOLSToolStripMenuItem.Name = "tOOLSToolStripMenuItem";
@@ -425,28 +438,28 @@
             // eXPORTTOEXCELToolStripMenuItem
             // 
             this.eXPORTTOEXCELToolStripMenuItem.Name = "eXPORTTOEXCELToolStripMenuItem";
-            this.eXPORTTOEXCELToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.eXPORTTOEXCELToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.eXPORTTOEXCELToolStripMenuItem.Text = "EXPORT TO EXCEL";
             this.eXPORTTOEXCELToolStripMenuItem.Click += new System.EventHandler(this.eXPORTTOEXCELToolStripMenuItem_Click);
             // 
             // rEFRESHAVAILABILITYToolStripMenuItem
             // 
             this.rEFRESHAVAILABILITYToolStripMenuItem.Name = "rEFRESHAVAILABILITYToolStripMenuItem";
-            this.rEFRESHAVAILABILITYToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.rEFRESHAVAILABILITYToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.rEFRESHAVAILABILITYToolStripMenuItem.Text = "REFRESH AVAILABILITY";
             this.rEFRESHAVAILABILITYToolStripMenuItem.Click += new System.EventHandler(this.rEFRESHAVAILABILITYToolStripMenuItem_Click);
             // 
             // sELECTCOLUMNSToolStripMenuItem
             // 
             this.sELECTCOLUMNSToolStripMenuItem.Name = "sELECTCOLUMNSToolStripMenuItem";
-            this.sELECTCOLUMNSToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.sELECTCOLUMNSToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.sELECTCOLUMNSToolStripMenuItem.Text = "SELECT COLUMNS";
             this.sELECTCOLUMNSToolStripMenuItem.Click += new System.EventHandler(this.sELECTCOLUMNSToolStripMenuItem_Click);
             // 
             // sAVELAYOUTToolStripMenuItem
             // 
             this.sAVELAYOUTToolStripMenuItem.Name = "sAVELAYOUTToolStripMenuItem";
-            this.sAVELAYOUTToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.sAVELAYOUTToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.sAVELAYOUTToolStripMenuItem.Text = "SAVE LAYOUT";
             this.sAVELAYOUTToolStripMenuItem.Click += new System.EventHandler(this.sAVELAYOUTToolStripMenuItem_Click);
             // 
@@ -485,20 +498,42 @@
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
-            // lblTotalStores
+            // lblSKUCounter
             // 
-            this.lblTotalStores.AutoSize = true;
-            this.lblTotalStores.Location = new System.Drawing.Point(225, 100);
-            this.lblTotalStores.Name = "lblTotalStores";
-            this.lblTotalStores.Size = new System.Drawing.Size(98, 13);
-            this.lblTotalStores.TabIndex = 21;
-            this.lblTotalStores.Text = "Total Stores: 18";
+            this.lblSKUCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSKUCounter.Location = new System.Drawing.Point(63, 86);
+            this.lblSKUCounter.Name = "lblSKUCounter";
+            this.lblSKUCounter.Size = new System.Drawing.Size(160, 17);
+            this.lblSKUCounter.TabIndex = 17;
+            this.lblSKUCounter.Text = "SKU 0/50";
+            this.lblSKUCounter.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // pgBar
+            // 
+            this.pgBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pgBar.Location = new System.Drawing.Point(452, 376);
+            this.pgBar.Name = "pgBar";
+            this.pgBar.Size = new System.Drawing.Size(388, 56);
+            this.pgBar.Step = 1;
+            this.pgBar.TabIndex = 18;
+            this.pgBar.Text = "[Formatted]";
+            this.pgBar.Visible = false;
+            // 
+            // aDDSTORETOSESSIONToolStripMenuItem
+            // 
+            this.aDDSTORETOSESSIONToolStripMenuItem.Name = "aDDSTORETOSESSIONToolStripMenuItem";
+            this.aDDSTORETOSESSIONToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.aDDSTORETOSESSIONToolStripMenuItem.Text = "ADD STORE TO SESSION";
+            this.aDDSTORETOSESSIONToolStripMenuItem.Click += new System.EventHandler(this.aDDSTORETOSESSIONToolStripMenuItem_Click);
             // 
             // frmPBItemDetail
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1293, 808);
+            this.Controls.Add(this.pgBar);
+            this.Controls.Add(this.lblSKUCounter);
             this.Controls.Add(this.pnlStatus);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -570,5 +605,8 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.Label lblTotalStores;
+        private System.Windows.Forms.Label lblSKUCounter;
+        private Infragistics.Win.UltraWinProgressBar.UltraProgressBar pgBar;
+        private System.Windows.Forms.ToolStripMenuItem aDDSTORETOSESSIONToolStripMenuItem;
     }
 }
