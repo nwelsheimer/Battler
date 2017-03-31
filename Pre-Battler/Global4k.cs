@@ -172,7 +172,7 @@ namespace General
                 }
                 else
                 {
-                    SQLCON = "Data Source=" + server + ";Initial Catalog=" + db + ";Integrated Security=True;";
+                    SQLCON = "Data Source=" + server + ";Initial Catalog=" + db + ";Integrated Security=True;Connection Timeout=180";
                 }
             }
             catch (Exception)
