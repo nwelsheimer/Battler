@@ -19,6 +19,7 @@ namespace Pre_Battler
         DataTable gridTable;
         DataTable rankDistinct;
         int sessionID;
+        bool bulkupdate = false;
         string SessionName; //Why the hell does this get set back to blank after the form loads???
         string userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
@@ -116,11 +117,12 @@ namespace Pre_Battler
             }
             else //else, just update the whole damn thing.
             {
-                foreach (DataRow dr in gridTable.Rows)
-                {
-                    if (Convert.ToInt32(dr["qtyRequested"]) > 0)
-                        Global.GetData("usp_PB_UpdateDetail @id=" + Convert.ToInt32(dr["id"]) + ", @qty=" + Convert.ToInt32(dr["qtyRequested"]));
-                }
+                string tableQ = "create table #tmp (id integer not null, qty integer not null)";
+                string updateQ = "update sd set sd.qtyRequested = tmp.qty from PB_SessionDetail sd inner join #tmp tmp " +
+                    "on sd.id=tmp.id where tmp.qty<>sd.qtyRequested; ";//drop table #tmp;
+                DataView tmpvw = new DataView(gridTable);
+                DataTable tmptbl = tmpvw.ToTable("Table", false, "id", "qtyRequested");
+                Global.BulkUpdate(tmptbl, "#tmp",tableQ, updateQ);
             }
         }
 
@@ -163,8 +165,11 @@ namespace Pre_Battler
                 }
             }
 
-            calculateShelves(RowNum);
-            calculateTotalOH(RowNum);
+            if (!bulkupdate)
+            {
+                calculateShelves(RowNum);
+                calculateTotalOH(RowNum);
+            }
         }
 
         private void calculateShelves(int row = 0)
@@ -405,7 +410,8 @@ namespace Pre_Battler
         {
 
             UpdateCellMath(e.Cell.Row.Index);
-            updateSQL(Convert.ToInt32(e.Cell.Row.Cells["id"].Text), Convert.ToInt32(e.Cell.Row.Cells["qtyRequested"].Text));
+            if (!bulkupdate)
+                updateSQL(Convert.ToInt32(e.Cell.Row.Cells["id"].Text), Convert.ToInt32(e.Cell.Row.Cells["qtyRequested"].Text));
         }
 
         private void sAVELAYOUTToolStripMenuItem_Click(object sender, EventArgs e)
@@ -437,6 +443,7 @@ namespace Pre_Battler
         {
 
             this.Cursor = Cursors.WaitCursor;
+            bulkupdate = true;
             DataRow rank;
             setupPGBar(ugrdItemDetail.Rows.GetFilteredInNonGroupByRows().Count());
 
@@ -447,9 +454,11 @@ namespace Pre_Battler
                 pgBar.PerformStep();
             }
             ugrdItemDetail.UpdateData();
+            calculateShelves();
+            calculateTotalOH();
             pgBar.Visible = false;
-            //updateSQL();
-
+            updateSQL();
+            bulkupdate = false;
             this.Cursor = Cursors.Default;
         }
 
@@ -469,6 +478,7 @@ namespace Pre_Battler
             setupPGBar(ugrdItemDetail.Rows.GetFilteredInNonGroupByRows().Count());
 
             this.Cursor = Cursors.WaitCursor;
+            bulkupdate = true;
             foreach (UltraGridRow r in ugrdItemDetail.Rows.GetFilteredInNonGroupByRows())
             {
                 //reset vars
@@ -514,9 +524,11 @@ namespace Pre_Battler
                 pgBar.PerformStep();
             }
             ugrdItemDetail.UpdateData();
+            calculateShelves();
+            calculateTotalOH();
             pgBar.Visible = false;
-            //updateSQL();
-
+            updateSQL();
+            bulkupdate = false;
             this.Cursor = Cursors.Default;
         }
 
@@ -530,6 +542,7 @@ namespace Pre_Battler
             setupPGBar(ugrdItemDetail.Rows.GetFilteredInNonGroupByRows().Count());
 
             this.Cursor = Cursors.WaitCursor;
+            bulkupdate = true;
 
             foreach (UltraGridRow r in ugrdItemDetail.Rows.GetFilteredInNonGroupByRows())
             {
@@ -544,9 +557,11 @@ namespace Pre_Battler
                 pgBar.PerformStep();
             }
             ugrdItemDetail.UpdateData();
+            calculateShelves();
+            calculateTotalOH();
             pgBar.Visible = false;
-            //updateSQL();
-
+            updateSQL();
+            bulkupdate = false;
             this.Cursor = Cursors.Default;
         }
         #endregion

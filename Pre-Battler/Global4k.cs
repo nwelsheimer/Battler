@@ -63,6 +63,45 @@ namespace General
             }
         }
 
+        public static void BulkUpdate(DataTable update, string tempTableName, string tempTableQuery, string updateQuery)
+        {
+            
+            using (SqlCommand command = new SqlCommand("", sqlConn))
+            {
+                try
+                {
+                    sqlConn.Open();
+
+                    //Creating temp table on database
+                    command.CommandText = tempTableQuery;
+                    command.ExecuteNonQuery();
+
+                    //Bulk insert into temp table
+                    using (SqlBulkCopy bulkcopy = new SqlBulkCopy(sqlConn))
+                    {
+                        bulkcopy.BulkCopyTimeout = 660;
+                        bulkcopy.DestinationTableName = tempTableName;
+                        bulkcopy.WriteToServer(update);
+                        bulkcopy.Close();
+                    }
+
+                    // Updating destination table, and dropping temp table
+                    command.CommandTimeout = 300;
+                    command.CommandText = updateQuery;
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    // Handle exception properly
+                }
+                finally
+                {
+                    sqlConn.Close();
+                }
+            }
+            
+        }
+
         public static string ExecuteQueryGetId(string query)
         {
             CheckConnection();
