@@ -59,7 +59,7 @@ namespace Pre_Battler
             gridView = new DataView(ds.Tables[0]);
             gridTable = gridView.ToTable();
 
-            gridTable.Columns.Add("WOH", typeof(System.Int32)); //Add column for weeks on hand
+            gridTable.Columns.Add("WOH", typeof(System.Decimal)); //Add column for weeks on hand
             gridTable.Columns.Add("TotalShelves", typeof(System.Decimal)); //Add column for total shelves
             gridTable.Columns.Add("TotalOH", typeof(System.Int32)); //Add column for total OH
             calculateShelves();
@@ -167,8 +167,8 @@ namespace Pre_Battler
 
             if (!bulkupdate)
             {
-                calculateShelves(RowNum);
-                calculateTotalOH(RowNum);
+                calculateShelves(Convert.ToInt32(updatedRow.Cells["Id"].Value.ToString()));
+                calculateTotalOH(Convert.ToInt32(updatedRow.Cells["Id"].Value.ToString()));
             }
         }
 
@@ -179,11 +179,23 @@ namespace Pre_Battler
             /// how it's been filtered, and doesn't always match the underlying table. That in itself isn't a problem, but when you change 
             /// the data in the grid, it fires off the cell math function, which in turn fires this off again, which updates the cell again, 
             /// which starts the whole process over. Doing it like this isn't causing much of a speed hit at the moment, so we keep as is.
+
+
             foreach (DataRow dr in gridTable.Rows)
             {
-                dr["TotalShelves"] = Convert.ToDecimal(dr["qtyPerShelf"]) > 0 ?
-                            (Convert.ToDecimal(dr["qtyRequested"]) / Convert.ToDecimal(dr["qtyPerShelf"])).ToString("0.##")
-                            : "0";
+                if (row > 0)
+                {
+                    if (dr["Id"].ToString() == row.ToString())
+                        dr["TotalShelves"] = Convert.ToDecimal(dr["qtyPerShelf"]) > 0 ?
+                                (Convert.ToDecimal(dr["qtyRequested"]) / Convert.ToDecimal(dr["qtyPerShelf"])).ToString("0.##")
+                                : "0";
+                }
+                else
+                {
+                    dr["TotalShelves"] = Convert.ToDecimal(dr["qtyPerShelf"]) > 0 ?
+                                (Convert.ToDecimal(dr["qtyRequested"]) / Convert.ToDecimal(dr["qtyPerShelf"])).ToString("0.##")
+                                : "0";
+                }
             }
         }
 
@@ -191,16 +203,24 @@ namespace Pre_Battler
         {
             foreach (DataRow dr in gridTable.Rows)
             {
-                dr["TotalOH"] = Convert.ToInt32(dr["qtyRequested"]) + Convert.ToInt32(dr["OnHand"]);
+                if (row > 0)
+                {
+                    if (dr["Id"].ToString() == row.ToString())
+                        dr["TotalOH"] = Convert.ToInt32(dr["qtyRequested"]) + Convert.ToInt32(dr["OnHand"]);
+                }
+                else
+                {
+                    dr["TotalOH"] = Convert.ToInt32(dr["qtyRequested"]) + Convert.ToInt32(dr["OnHand"]);
+                }
             }
         }
 
         private void UpdateWOH(string WOHMethod)
         {
             //Updates the WOH column depending on what option is passed in the input string
-            int sold;
-            int onhand;
-            int woh;
+            decimal sold;
+            decimal onhand;
+            decimal woh;
 
             foreach (DataRow dr in gridTable.Rows)
             {
@@ -230,7 +250,7 @@ namespace Pre_Battler
 
                     woh = sold > 0 ? onhand / sold : 999;
                 }
-                dr["WOH"] = woh;
+                dr["WOH"] = woh.ToString("0.#");
             }
         }
 
@@ -279,6 +299,8 @@ namespace Pre_Battler
             ugrdItemDetail.DisplayLayout.Bands[0].Columns["YTDDumps"].CellActivation = Activation.Disabled;
             ugrdItemDetail.DisplayLayout.Bands[0].Columns["Product"].CellActivation = Activation.Disabled;
             ugrdItemDetail.DisplayLayout.Bands[0].Columns["PackQty"].CellActivation = Activation.Disabled;
+            ugrdItemDetail.DisplayLayout.Bands[0].Columns["Region"].CellActivation = Activation.Disabled;
+            ugrdItemDetail.DisplayLayout.Bands[0].Columns["Allocated"].CellActivation = Activation.Disabled;
 
             ugrdRanks.DisplayLayout.Bands[0].Columns["Rank"].CellActivation = Activation.Disabled;
 
@@ -444,15 +466,36 @@ namespace Pre_Battler
 
             this.Cursor = Cursors.WaitCursor;
             bulkupdate = true;
+            int rowindex = 0;
+            decimal rounded = 0;
+            int packQty = 0;
             DataRow rank;
             setupPGBar(ugrdItemDetail.Rows.GetFilteredInNonGroupByRows().Count());
 
+            //we went through some steps to speed this shit up. The grid responds a ton faster if you turn painting off, updated the dataset, then refresh the grid
+            ugrdItemDetail.BeginUpdate();
+            ugrdItemDetail.SuspendRowSynchronization();
+            ugrdItemDetail.SuspendSummaryUpdates();
+
             foreach (UltraGridRow r in ugrdItemDetail.Rows.GetFilteredInNonGroupByRows())
             {
+                //Get rank row and index of dataset
                 rank = rankDistinct.Select("Rank = '" + r.Cells["Rank"].Value + "'")[0];
-                r.Cells["qtyRequested"].Value = rank["Quantity"];
+                rowindex = r.ListIndex;
+                //Round to nearest pack qty
+                rounded = Convert.ToInt32(rank["Quantity"]);
+                packQty = Convert.ToInt32(gridTable.Rows[rowindex]["PackQty"]);
+                rounded = Math.Round(rounded / packQty) * packQty;
+
+                gridTable.Rows[rowindex]["qtyRequested"] = rounded; //This is fast
+                //r.Cells["qtyRequested"].Value = rank["Quantity"]; This is slow
                 pgBar.PerformStep();
             }
+            //end of speed enhancements
+            ugrdItemDetail.ResumeRowSynchronization();
+            ugrdItemDetail.ResumeSummaryUpdates(true);
+            ugrdItemDetail.EndUpdate();
+
             ugrdItemDetail.UpdateData();
             calculateShelves();
             calculateTotalOH();
@@ -473,9 +516,17 @@ namespace Pre_Battler
             int onhand;
             int woh;
             int demand;
+            int rowindex = 0;
+            decimal rounded = 0;
+            int packQty = 0;
             string WOHMethod = cmbWOH.Text;
 
             setupPGBar(ugrdItemDetail.Rows.GetFilteredInNonGroupByRows().Count());
+
+            //we went through some steps to speed this shit up. The grid responds a ton faster if you turn painting off, updated the dataset, then refresh the grid
+            ugrdItemDetail.BeginUpdate();
+            ugrdItemDetail.SuspendRowSynchronization();
+            ugrdItemDetail.SuspendSummaryUpdates();
 
             this.Cursor = Cursors.WaitCursor;
             bulkupdate = true;
@@ -487,13 +538,14 @@ namespace Pre_Battler
                 woh = 0;
                 demand = 0;
                 requestedWOH = 0;
+                rowindex = r.ListIndex;
 
                 //Check rank table and find the target WOH
                 rank = rankDistinct.Select("Rank = '" + r.Cells["Rank"].Value + "'")[0];
                 requestedWOH = Convert.ToInt32(rank["Quantity"].ToString()); //We have a requested amount now
 
                 //Get the on hand
-                onhand = Convert.ToInt32(r.Cells["OnHand"].Value);
+                onhand = Convert.ToInt32(gridTable.Rows[rowindex]["OnHand"]);
 
                 //Calculate the sold
                 if (onhand > 0)
@@ -501,16 +553,16 @@ namespace Pre_Battler
                     switch (WOHMethod)
                     {
                         case "WOH last week":
-                            sold = Convert.ToInt32(r.Cells["LW_Sold"].Value);
+                            sold = Convert.ToInt32(gridTable.Rows[rowindex]["LW_Sold"]);
                             break;
                         case "WOH this week":
-                            sold = Convert.ToInt32(r.Cells["CW_Sold"].Value);
+                            sold = Convert.ToInt32(gridTable.Rows[rowindex]["CW_Sold"]);
                             break;
                         case "WOH 2 weeks ago":
-                            sold = Convert.ToInt32(r.Cells["TW_Sold"].Value);
+                            sold = Convert.ToInt32(gridTable.Rows[rowindex]["TW_Sold"]);
                             break;
                         case "WOH 2 week average":
-                            sold = (Convert.ToInt32(r.Cells["TW_Sold"].Value) + Convert.ToInt32(r.Cells["LW_Sold"].Value)) / 2;
+                            sold = (Convert.ToInt32(gridTable.Rows[rowindex]["TW_Sold"]) + Convert.ToInt32(gridTable.Rows[rowindex]["LW_Sold"])) / 2;
                             break;
                     }
 
@@ -518,11 +570,20 @@ namespace Pre_Battler
                 }
 
                 demand = requestedWOH - woh > 0 ? (requestedWOH - woh) * sold : 0;
+                //Round to nearest pack qty
+                rounded = demand;
+                packQty = Convert.ToInt32(gridTable.Rows[rowindex]["PackQty"]);
+                rounded = Math.Round(rounded / packQty) * packQty;
 
-                r.Cells["qtyRequested"].Value = demand;
+                gridTable.Rows[rowindex]["qtyRequested"] = rounded;
 
                 pgBar.PerformStep();
             }
+            //end of speed enhancements
+            ugrdItemDetail.ResumeRowSynchronization();
+            ugrdItemDetail.ResumeSummaryUpdates(true);
+            ugrdItemDetail.EndUpdate();
+
             ugrdItemDetail.UpdateData();
             calculateShelves();
             calculateTotalOH();
@@ -538,24 +599,43 @@ namespace Pre_Battler
             int onHand = 0;
             int requestedQty = 0;
             int newQty = 0;
+            int rowindex = 0;
+            decimal rounded = 0;
+            int packQty = 0;
 
             setupPGBar(ugrdItemDetail.Rows.GetFilteredInNonGroupByRows().Count());
 
             this.Cursor = Cursors.WaitCursor;
             bulkupdate = true;
 
+            //we went through some steps to speed this shit up. The grid responds a ton faster if you turn painting off, updated the dataset, then refresh the grid
+            ugrdItemDetail.BeginUpdate();
+            ugrdItemDetail.SuspendRowSynchronization();
+            ugrdItemDetail.SuspendSummaryUpdates();
+
             foreach (UltraGridRow r in ugrdItemDetail.Rows.GetFilteredInNonGroupByRows())
             {
                 rank = rankDistinct.Select("Rank = '" + r.Cells["Rank"].Value + "'")[0];
+                rowindex = r.ListIndex;
 
-                onHand = Convert.ToInt32(r.Cells["OnHand"].Value);
+                onHand = Convert.ToInt32(gridTable.Rows[rowindex]["OnHand"]);
                 requestedQty = Convert.ToInt32(rank["Quantity"].ToString());
                 newQty = requestedQty - onHand > 0 ? requestedQty - onHand : 0;
 
-                r.Cells["qtyRequested"].Value = newQty;
+                //Round to nearest pack qty
+                rounded = newQty;
+                packQty = Convert.ToInt32(gridTable.Rows[rowindex]["PackQty"]);
+                rounded = Math.Round(rounded / packQty) * packQty;
+
+                gridTable.Rows[rowindex]["qtyRequested"] = rounded;
 
                 pgBar.PerformStep();
             }
+            //end of speed enhancements
+            ugrdItemDetail.ResumeRowSynchronization();
+            ugrdItemDetail.ResumeSummaryUpdates(true);
+            ugrdItemDetail.EndUpdate();
+
             ugrdItemDetail.UpdateData();
             calculateShelves();
             calculateTotalOH();

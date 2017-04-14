@@ -379,7 +379,7 @@ namespace Pre_Battler
         private void btnImport_Click(object sender, EventArgs e)
         {
             string filename = xl4k.getFilePath(2);
-            grdShipToTable = xl4k.basicExcelImport(filename, "Export");
+            grdShipToTable = xl4k.basicExcelImport(filename);
             grdShipToTable.Columns.Add("Selected", typeof(System.Boolean));
             foreach (DataRow dr in grdShipToTable.Rows)
                 dr["Selected"] = true;

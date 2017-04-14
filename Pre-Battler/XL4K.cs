@@ -110,7 +110,7 @@ namespace Pre_Battler
             return false;
         }
 
-        public static DataTable basicExcelImport(string path, string tabName, bool hasHeader = true)
+        public static DataTable basicExcelImport(string path, string tabName="", bool hasHeader = true)
         {
             using (var pck = new ExcelPackage())
             {
@@ -118,7 +118,9 @@ namespace Pre_Battler
                 {
                     pck.Load(stream);
                 }
-                var ws = pck.Workbook.Worksheets[tabName];
+
+                var ws = pck.Workbook.Worksheets[1];
+
                 DataTable tbl = new DataTable();
                 foreach (var firstRowCell in ws.Cells[1, 1, 1, ws.Dimension.End.Column])
                 {
