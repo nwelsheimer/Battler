@@ -127,7 +127,7 @@ namespace Pre_Battler
             grdStores.DisplayLayout.Bands[0].Columns["custom4"].Header.Caption = "Custom 4";
 
             //Load grid layout
-            Global.GridLayout(grdStores,2,Properties.Settings.Default.grdStoreLayout);
+            battleEtc.GridLayout(grdStores,2,Properties.Settings.Default.grdStoreLayout);
         }
         #endregion
         #region BS Functions
@@ -309,7 +309,7 @@ namespace Pre_Battler
 
         private void grdStores_KeyDown(object sender, KeyEventArgs e)
         {
-            Global.GridNavigation(grdStores, e);
+            battleEtc.GridNavigation(grdStores, e);
         }
 
         private void chkSelectAll_Click(object sender, EventArgs e)
@@ -326,7 +326,7 @@ namespace Pre_Battler
         private void sAVELAYOUTToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //Save the grid layout
-            Properties.Settings.Default.grdStoreLayout = Global.GridLayout(grdStores, 1);
+            Properties.Settings.Default.grdStoreLayout = battleEtc.GridLayout(grdStores, 1);
             Properties.Settings.Default.Save();
         }
 
