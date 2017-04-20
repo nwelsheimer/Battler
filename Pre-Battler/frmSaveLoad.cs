@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using General;
+using Microsoft.Win32;
 using Infragistics.Win.UltraWinGrid;
 
 namespace Pre_Battler
@@ -18,6 +15,7 @@ namespace Pre_Battler
         int selectedStores = 0;
         System.Data.DataView grdShipToView;
         System.Data.DataTable grdShipToTable;
+        RegistryKey jans = Global.get_reg_key("JANS", true); //Getting settings from registry now.
 
         public frmSaveLoad()
         {
@@ -49,22 +47,25 @@ namespace Pre_Battler
 
         private void fnSetupDB()
         {
-            string dbServer = Properties.Settings.Default.dbServer;
-            string dbName = Properties.Settings.Default.dbName;
+            string dbServer = jans.GetValue("dbHost").ToString();//Properties.Settings.Default.dbServer;
+            string dbName = jans.GetValue("dbName").ToString();//Properties.Settings.Default.dbName;
+            string dbUser = jans.GetValue("dbUser").ToString();//Properties.Settings.Default.dbUser;
+            string dbPass = jans.GetValue("dbPass").ToString();//Properties.Settings.Default.dbPassword;
+            string dbPort = jans.GetValue("dbPort").ToString();//Properties.Settings.Default.dbPassword;
 
-            if (dbServer == "" || dbName == "")
-            {
-                if (MessageBox.Show("Database is not currently configure. Do this now?", "Setup DB",MessageBoxButtons.YesNo) == DialogResult.Yes)
-                {
-                    PBOptions form = new PBOptions();
-                    form.ShowDialog();
-                }
-            }
+           // if (dbServer == "" || dbName == "")
+           //{
+           //     if (MessageBox.Show("Database is not currently configure. Do this now?", "Setup DB",MessageBoxButtons.YesNo) == DialogResult.Yes)
+           //     {
+           //         PBOptions form = new PBOptions();
+           //         form.ShowDialog();
+           //     }
+           // }
 
             try
             {
                 //Connect to server
-                Global.SetConnectionString(dbServer,dbName);
+                Global.SetConnectionString(dbServer,dbName,dbPort,dbUser,dbPort);
                 
                 //Fill in and enable the accounts combo
                 cmbAccount.DataSource = Global.GetData("exec usp_PB_SelectAccounts").Tables[0].DefaultView;
@@ -141,11 +142,7 @@ namespace Pre_Battler
             selectedStores = Convert.ToInt32(grdShipToTable.Compute("COUNT(Selected)", "Selected='true'")) + activeCell;
             sbStoreCount.Text = "Selected Stores: " + selectedStores.ToString();
         }
-        private void oPTIONSToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            PBOptions form = new PBOptions();
-            form.ShowDialog();
-        }
+
 
         private void sbConnected_Click(object sender, EventArgs e)
         {

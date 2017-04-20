@@ -50,7 +50,6 @@
             this.cLOSEToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tOOLSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lOADSAVEDSESSIONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.oPTIONSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sELECTCOLUMNSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sAVELAYOUTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -141,7 +140,6 @@
             // 
             this.tOOLSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lOADSAVEDSESSIONToolStripMenuItem,
-            this.oPTIONSToolStripMenuItem,
             this.sELECTCOLUMNSToolStripMenuItem,
             this.sAVELAYOUTToolStripMenuItem});
             this.tOOLSToolStripMenuItem.Name = "tOOLSToolStripMenuItem";
@@ -154,13 +152,6 @@
             this.lOADSAVEDSESSIONToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.lOADSAVEDSESSIONToolStripMenuItem.Text = "LOAD SAVED SESSION";
             this.lOADSAVEDSESSIONToolStripMenuItem.Click += new System.EventHandler(this.lOADSAVEDSESSIONToolStripMenuItem_Click);
-            // 
-            // oPTIONSToolStripMenuItem
-            // 
-            this.oPTIONSToolStripMenuItem.Name = "oPTIONSToolStripMenuItem";
-            this.oPTIONSToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.oPTIONSToolStripMenuItem.Text = "OPTIONS";
-            this.oPTIONSToolStripMenuItem.Click += new System.EventHandler(this.oPTIONSToolStripMenuItem_Click);
             // 
             // sELECTCOLUMNSToolStripMenuItem
             // 
@@ -496,7 +487,6 @@
         private System.Windows.Forms.ToolStripMenuItem fILEToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cLOSEToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem tOOLSToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem oPTIONSToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel sbConnected;
         private System.Windows.Forms.ToolStripStatusLabel sbStoreCount;

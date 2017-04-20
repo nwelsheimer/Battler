@@ -157,7 +157,9 @@ namespace Pre_Battler
 
                 //Don't always know how many regions there will be
                 int totalColumns = export.Columns.Count;
-                Char lastColumn = Global.LetterToNum(totalColumns+1);
+                
+                string lastColumn = totalColumns + 1 <= 26 ? Global.LetterToNum(totalColumns+1).ToString() :
+                    "A"+Global.LetterToNum(totalColumns + 1-26).ToString();
 
                 // ok, we can run the real code now
                 using (ExcelPackage xlPackage = new ExcelPackage(newFile))
@@ -199,11 +201,15 @@ namespace Pre_Battler
                         worksheet.Cells["B4"].Value = "SKU Desc";
                         worksheet.Cells["C4"].Value = "SKU Size";
                         worksheet.Cells["D4"].Value = "SKU Number";
+                        string cell = "";
                         for (int i=5; i<=totalColumns; i++)
                         {
-                            worksheet.Cells[Global.LetterToNum(i) + "4"].Value = export.Columns[i-1].ColumnName;
+                            cell = i <= 26 ? Global.LetterToNum(i).ToString() : "A" + Global.LetterToNum(i-26).ToString();
+                            worksheet.Cells[cell + "4"].Value = export.Columns[i-1].ColumnName;
                         }
-                        worksheet.Cells[Global.LetterToNum(totalColumns+1)+"4"].Value = "Total";
+                        cell = totalColumns + 1 <= 26 ? Global.LetterToNum(totalColumns + 1).ToString() :
+                                "A" + Global.LetterToNum(totalColumns + 1 - 26).ToString();
+                        worksheet.Cells[cell+"4"].Value = "Total";
                         worksheet.Cells["A4:" + lastColumn + "4"].Style.Fill.PatternType = ExcelFillStyle.Solid;
                         worksheet.Cells["A4:" + lastColumn + "4"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(184, 204, 228));
                         worksheet.Cells["A4:" + lastColumn + "4"].Style.Font.Bold = true;
@@ -254,7 +260,8 @@ namespace Pre_Battler
 
                         //reset globals
                         totalColumns = export.Columns.Count;
-                        lastColumn = Global.LetterToNum(totalColumns);
+                        lastColumn = totalColumns + 1 <= 26 ? Global.LetterToNum(totalColumns + 1).ToString() :
+                            "A" + Global.LetterToNum(totalColumns + 1 - 26).ToString();
                         int row = startRow;
 
                         //Create Headers and format them 

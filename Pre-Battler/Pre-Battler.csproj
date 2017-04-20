@@ -102,12 +102,6 @@
       <DependentUpon>frmAddStore.cs</DependentUpon>
     </Compile>
     <Compile Include="XL4K.cs" />
-    <Compile Include="PBoptions.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PBoptions.Designer.cs">
-      <DependentUpon>PBoptions.cs</DependentUpon>
-    </Compile>
     <Compile Include="frmPBItemDetail.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -124,9 +118,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmAddStore.resx">
       <DependentUpon>frmAddStore.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PBoptions.resx">
-      <DependentUpon>PBoptions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmPBItemDetail.resx">
       <DependentUpon>frmPBItemDetail.cs</DependentUpon>
